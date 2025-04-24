@@ -1,0 +1,30 @@
+[
+  {
+    "id": 2,
+    "name": "mobile",
+    "price": 300,
+    "description": "this is mobile",
+    "stock": 49
+  },
+  {
+    "id": 3,
+    "name": "headphones",
+    "price": 300000000000,
+    "description": "this is headphones",
+    "stock": 9
+  },
+  {
+    "name": "pc",
+    "price": 2000,
+    "description": "this is pc",
+    "id": 1745233821917,
+    "stock": 20
+  },
+  {
+    "name": "mobile",
+    "price": 300,
+    "description": "this is mobile",
+    "stock": 49,
+    "id": 1745524901873
+  }
+]
