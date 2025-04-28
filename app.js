@@ -1,25 +1,18 @@
 import express from "express";
 import fs from "fs";
+import morgan from "morgan";
 const app = express();
 app.use(express.json());
 app.use((req, res, next) => {
   console.log("ola midllware");
   next();
 });
+app.use(morgan("dev"));
 
 // Helper function to read fresh data
 const readProductsData = () => {
   return JSON.parse(fs.readFileSync("./data/products.json", "utf8"));
 };
-
-// function calculateDate() {
-//   const date = new Date();
-//   const year = date.getFullYear().toString();
-//   const month = (date.getMonth() + 1).toString().padStart(2, "0");
-//   const day = date.getDate().toString().padStart(2, "0");
-//   const createdAt = year + "/" + month + "/" + day;
-//   return createdAt;
-// }
 
 const getProducts = (req, res) => {
   const products = readProductsData();
@@ -89,22 +82,51 @@ const buyProduct = (req, res) => {
   res.json(targetProduct);
 };
 
+const getUser = (req, res) => {
+  res.send("get users");
+};
+const createUser = (req, res) => {
+  res.send("create users");
+};
+
+const editUser = (req, res) => {
+  res.send("edit user");
+};
+const deleteUser = (req, res) => {
+  res.send("delte user");
+};
+
 /////////////////////////////////////////////////////////////////////////////
+
+const productsRouter = express.Router();
+app.use("/products", productsRouter);
+
+productsRouter.route("/").get(getProducts).post(createProducts);
+productsRouter.route("/:id").put(editProduct).delete(deleteProduct);
+productsRouter.route("/buy/:id").post(buyProduct);
+
+///////////////
+
+const usersRouter = express.Router();
+app.use("/users", usersRouter);
+
+usersRouter.route("/").get(getUser).post(createUser);
+usersRouter.route("/:id").put(editUser).delete(deleteUser);
 
 // // პროდუქტების მიღება
 // app.get("/products", getProducts);
 // // ახალი პროდუქტის დამატება
 // app.post("/products", createProducts);
-app.route("/products").get(getProducts).post(createProducts); // საერთო როუტი ერთანირი სახელების მქონეებისთვის
+// საერთო როუტი ერთანირი სახელების მქონეებისთვის
 // პროდუქტის შეცვლა
 // app.put("/products/:id", editProduct);
 // // წაშლა
 // app.delete("/products/:id", deleteProduct);
-app.route("products/:id").put(editProduct).delete(deleteProduct); //saerTo routi
+//saerTo routi
 
 // ყიდვა და რაოდენობაზე ერთს გამოკლება
-app.post("/products/buy/:id", buyProduct);
-app.route("/products/buy/:id").post(buyProduct);
+// app.post("/products/buy/:id", buyProduct);
+
 // პროდუქტების რაოდენის დათვლა
 // app.get("/products/count", (req, res) => {
 //   const products = readProductsData();
