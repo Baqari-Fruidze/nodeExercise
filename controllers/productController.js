@@ -1,9 +1,7 @@
-import express from "express";
 import fs from "fs";
 const readProductsData = () => {
   return JSON.parse(fs.readFileSync("./data/products.json", "utf8"));
 };
-const productsRouter = express.Router();
 const getProducts = (req, res) => {
   const products = readProductsData();
   res.json(products);
@@ -71,11 +69,4 @@ const buyProduct = (req, res) => {
   fs.writeFileSync("./data/products.json", JSON.stringify(products));
   res.json(targetProduct);
 };
-
-// app.use("/products", productsRouter);
-
-productsRouter.route("/").get(getProducts).post(createProducts);
-productsRouter.route("/:id").put(editProduct).delete(deleteProduct);
-productsRouter.route("/buy/:id").post(buyProduct);
-
-export default productsRouter;
+export { getProducts, createProducts, editProduct, deleteProduct, buyProduct };

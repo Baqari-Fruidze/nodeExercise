@@ -1,14 +1,15 @@
 import express from "express";
 import fs from "fs";
 import morgan from "morgan";
-import productsRouter from "./routes/productsRoute.js";
+import productRouter from "./routes/productRoute.js";
+import { get } from "http";
 const app = express();
 app.use(express.json());
-app.use((req, res, next) => {
-  console.log("ola midllware");
-  next();
-});
-app.use(morgan("dev"));
+// console.log(app.get("env"));
+console.log(process.env.NODE_ENV);
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
+}
 
 // Helper function to read fresh data
 
@@ -29,7 +30,7 @@ const deleteUser = (req, res) => {
 /////////////////////////////////////////////////////////////////////////////
 
 // const productsRouter = express.Router();
-app.use("/products", productsRouter);
+app.use("/products", productRouter);
 
 // productsRouter.route("/").get(getProducts).post(createProducts);
 // productsRouter.route("/:id").put(editProduct).delete(deleteProduct);
