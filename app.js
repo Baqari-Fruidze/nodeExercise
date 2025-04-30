@@ -2,38 +2,27 @@ import express from "express";
 import fs from "fs";
 import morgan from "morgan";
 import productRouter from "./routes/productRoute.js";
-import { get } from "http";
 import dotenv from "dotenv";
+import { json } from "stream/consumers";
+import userRouter from "./routes/userRoute.js";
+
 dotenv.config({ path: "./config.env" });
-console.log(process.env.DB_USER);
+// console.log(process.env.DB_USER);
 const app = express();
 app.use(express.json());
 // console.log(app.get("env"));
-console.log(process.env.NODE_ENV);
+// console.log(process.env.NODE_ENV);
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 
 // Helper function to read fresh data
 
-const getUser = (req, res) => {
-  res.send("get users");
-};
-const createUser = (req, res) => {
-  res.send("create users");
-};
-
-const editUser = (req, res) => {
-  res.send("edit user");
-};
-const deleteUser = (req, res) => {
-  res.send("delte user");
-};
-
 /////////////////////////////////////////////////////////////////////////////
 
 // const productsRouter = express.Router();
 app.use("/products", productRouter);
+app.use("/users", userRouter);
 
 // productsRouter.route("/").get(getProducts).post(createProducts);
 // productsRouter.route("/:id").put(editProduct).delete(deleteProduct);
@@ -41,11 +30,11 @@ app.use("/products", productRouter);
 
 ///////////////
 
-const usersRouter = express.Router();
-app.use("/users", usersRouter);
+// const usersRouter = express.Router();
+// app.use("/users", usersRouter);
 
-usersRouter.route("/").get(getUser).post(createUser);
-usersRouter.route("/:id").put(editUser).delete(deleteUser);
+// usersRouter.route("/").get(getUser).post(createUser);
+// usersRouter.route("/:id").put(editUser).delete(deleteUser);
 
 // // პროდუქტების მიღება
 // app.get("/products", getProducts);
