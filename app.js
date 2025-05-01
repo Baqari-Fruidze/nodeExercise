@@ -10,6 +10,10 @@ dotenv.config({ path: "./config.env" });
 // console.log(process.env.DB_USER);
 const app = express();
 app.use(express.json());
+app.use((req, res, next) => {
+  console.log("helo from middleware");
+  next();
+});
 // console.log(app.get("env"));
 // console.log(process.env.NODE_ENV);
 if (process.env.NODE_ENV === "development") {
