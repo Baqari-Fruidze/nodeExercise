@@ -8,5 +8,6 @@ import {
 
 const userRouter = express.Router();
 userRouter.route("/").get(getUser).post(createUser);
+userRouter.route("/:id").put(editUser).delete(deleteUser);
 
 export default userRouter;
