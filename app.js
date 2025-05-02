@@ -5,22 +5,29 @@ import productRouter from "./routes/productRoute.js";
 import dotenv from "dotenv";
 import { json } from "stream/consumers";
 import userRouter from "./routes/userRoute.js";
+import urlTimePathChecker from "./middlewares/urlTimePathChecker.js";
+import nameToSlug from "./middlewares/nameToSlug.js";
+import isMaintenance from "./middlewares/isMaintenance.js";
+import limiter from "./middlewares/limiter.js";
+// import amountTracker from "./middlewares/limiter";
 
 dotenv.config({ path: "./config.env" });
 // console.log(process.env.DB_USER);
 const app = express();
 app.use(express.json());
-app.use((req, res, next) => {
-  console.log("helo from middleware");
-  next();
-});
-// console.log(app.get("env"));
-// console.log(process.env.NODE_ENV);
-if (process.env.NODE_ENV === "development") {
-  app.use(morgan("dev"));
-}
+app.use(limiter);
+app.use(isMaintenance);
+// app.use((req, res, next) => {
+//   console.log("helo from middleware");
+//   next();
+// });
 
-// Helper function to read fresh data
+// if (process.env.NODE_ENV === "development") {
+//   app.use(morgan("dev"));
+// }
+
+app.use(urlTimePathChecker);
+app.use(nameToSlug);
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -82,6 +89,6 @@ app.use("/users", userRouter);
 //     .json({ message: "All products have been deleted successfully" });
 // });
 
-app.listen(3000, () => {
+app.listen(process.env.PORT, () => {
   console.log("your server is running on port 3000");
 });

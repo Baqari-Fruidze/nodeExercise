@@ -42,5 +42,23 @@
     "stock": 49,
     "id": 1745781660104,
     "createdAt": "2025-04-27T19:21:00.104Z"
+  },
+  {
+    "name": "mobiledadade",
+    "price": 300,
+    "description": "this is mobile",
+    "stock": 48,
+    "slug": "mobiledadade",
+    "id": 1746170913425,
+    "createdAt": "2025-05-02T07:28:33.425Z"
+  },
+  {
+    "name": "mobiledadade fdf dfdfdf weqqsfaac test",
+    "price": 300,
+    "description": "this is mobile",
+    "stock": 48,
+    "slug": "mobiledadade-fdf-dfdfdf-weqqsfaac-test",
+    "id": 1746170941034,
+    "createdAt": "2025-05-02T07:29:01.034Z"
   }
 ]
