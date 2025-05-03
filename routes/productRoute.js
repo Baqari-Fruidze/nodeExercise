@@ -7,6 +7,7 @@ import {
   deleteProduct,
   buyProduct,
 } from "../controllers/productController.js";
+import nameToSlug from "../middlewares/nameToSlug.js";
 // const readProductsData = () => {
 //   return JSON.parse(fs.readFileSync("./data/products.json", "utf8"));
 // };
@@ -81,7 +82,7 @@ const productRouter = express.Router();
 
 // app.use("/products", productsRouter);
 
-productRouter.route("/").get(getProducts).post(createProducts);
+productRouter.route("/").get(getProducts).post(nameToSlug, createProducts);
 productRouter.route("/:id").put(editProduct).delete(deleteProduct);
 productRouter.route("/buy/:id").post(buyProduct);
 

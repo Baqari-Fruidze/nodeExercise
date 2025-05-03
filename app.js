@@ -2,21 +2,27 @@ import express from "express";
 import fs from "fs";
 import morgan from "morgan";
 import productRouter from "./routes/productRoute.js";
-import dotenv from "dotenv";
 import { json } from "stream/consumers";
 import userRouter from "./routes/userRoute.js";
 import urlTimePathChecker from "./middlewares/urlTimePathChecker.js";
 import nameToSlug from "./middlewares/nameToSlug.js";
 import isMaintenance from "./middlewares/isMaintenance.js";
 import limiter from "./middlewares/limiter.js";
-// import amountTracker from "./middlewares/limiter";
+
+import dotenv from "dotenv";
 
 dotenv.config({ path: "./config.env" });
 // console.log(process.env.DB_USER);
 const app = express();
+if (process.env.NODE_ENV === "production") {
+  app.use(isMaintenance);
+}
 app.use(express.json());
-app.use(limiter);
-app.use(isMaintenance);
+
+if (process.env.NODE_ENV === "production") {
+  app.use(limiter);
+}
+
 // app.use((req, res, next) => {
 //   console.log("helo from middleware");
 //   next();
@@ -27,7 +33,6 @@ app.use(isMaintenance);
 // }
 
 app.use(urlTimePathChecker);
-app.use(nameToSlug);
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -89,6 +94,4 @@ app.use("/users", userRouter);
 //     .json({ message: "All products have been deleted successfully" });
 // });
 
-app.listen(process.env.PORT, () => {
-  console.log("your server is running on port 3000");
-});
+export default app;
