@@ -1,9 +1,24 @@
 import fs from "fs";
+import mongoose from "mongoose";
+
 const readProductsData = () => {
   return JSON.parse(fs.readFileSync("./data/products.json", "utf8"));
 };
-const getProducts = (req, res) => {
-  const products = readProductsData();
+
+const productSchema = new mongoose.Schema({
+  id: { type: Number, required: true, unique: true },
+  name: { type: String, required: true },
+  price: { type: Number, required: true },
+  description: { type: String, required: true },
+  stock: { type: Number, required: true },
+  slug: { type: String },
+  createdAt: { type: Date, default: Date.now },
+});
+const Product = mongoose.model("Product", productSchema);
+
+const getProducts = async (req, res) => {
+  const products = await Product.find({});
+  console.log(products);
   res.json(products);
 };
 const createProducts = (req, res) => {
