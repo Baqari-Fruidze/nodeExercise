@@ -31,30 +31,58 @@ const getProducts = async (req, res) => {
   res.json(products);
 };
 const createProducts = async (req, res) => {
-  const products = await readProductsData();
+  // const products = await readProductsData();
+
+  // const newProduct = {
+  //   ...req.body,
+  //   id: Date.now(),
+  //   createdAt: new Date().toISOString(),
+  // };
+
+  // const uniqueChecker = products.every(
+  //   (product) => product.name !== newProduct.name
+  // );
+
+  // if (!newProduct.price || !newProduct.name) {
+  //   return res.status(400).send("name and price are required fields");
+  // } else if (uniqueChecker) {
+  //   // products.push(newProduct);
+  //   // fs.copyFileSync("./data/products.json", "./data/products_backup.json");
+  //   // fs.writeFileSync("./data/products.json", JSON.stringify(products));
+  //   await Product.create(newProduct);
+
+  //   res.status(201).json(newProduct);
+  // } else {
+  //   res.status(409).send("product already exists");
+  // }
+
+  const { name, price, description, stock, slug } = req.body;
+
+  if (
+    !req.body.name ||
+    !req.body.price ||
+    !req.body.stock ||
+    !req.body.description
+  ) {
+    return res
+      .status(400)
+      .send("name  price stock  description are required fields");
+  }
+
+  const existingProduct = await Product.findOne({ name: req.body.name });
+
+  if (existingProduct) {
+    return res.status(409).send("product already exists");
+  }
 
   const newProduct = {
     ...req.body,
     id: Date.now(),
-    createdAt: new Date().toISOString(),
+    createdAt: new Date(),
   };
 
-  const uniqueChecker = products.every(
-    (product) => product.name !== newProduct.name
-  );
-
-  if (!newProduct.price || !newProduct.name) {
-    return res.status(400).send("name and price are required fields");
-  } else if (uniqueChecker) {
-    // products.push(newProduct);
-    // fs.copyFileSync("./data/products.json", "./data/products_backup.json");
-    // fs.writeFileSync("./data/products.json", JSON.stringify(products));
-    await Product.create(newProduct);
-
-    res.status(201).json(newProduct);
-  } else {
-    res.status(409).send("product already exists");
-  }
+  const createdProduct = await Product.create(newProduct);
+  res.status(201).json(createdProduct);
 };
 
 // const editProduct = async(req, res) => {
