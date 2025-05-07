@@ -121,13 +121,28 @@ const editProduct = async (req, res) => {
   }
 };
 
-const deleteProduct = (req, res) => {
-  const products = readProductsData();
-  const newData = products.filter(
-    (product) => product.id !== Number(req.params.id)
-  );
-  fs.writeFileSync("./data/products.json", JSON.stringify(newData));
-  res.status(204).send("product deleted");
+const deleteProduct = async (req, res) => {
+  // const products = readProductsData();
+  // const newData = products.filter(
+  //   (product) => product.id !== Number(req.params.id)
+  // );
+  // fs.writeFileSync("./data/products.json", JSON.stringify(newData));
+  // res.status(204).send("product deleted");
+
+  const { id } = req.params;
+
+  try {
+    const deletedProduct = await Product.findOneAndDelete({ id: Number(id) });
+
+    if (!deletedProduct) {
+      return res.status(404).send("Product not found");
+    }
+
+    res.status(200).json({ message: "Product deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred while deleting the product");
+  }
 };
 const buyProduct = (req, res) => {
   const products = readProductsData();
