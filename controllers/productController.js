@@ -1,88 +1,53 @@
 import fs from "fs";
+import Product from "../models/productModel.js";
 import mongoose from "mongoose";
 
-const readProductsData = async () => {
-  // return JSON.parse(fs.readFileSync("./data/products.json", "utf8"));
-  const Product = mongoose.model("Product", productSchema);
-  const products = await Product.find({});
-  return products;
-};
-
-const productSchema = new mongoose.Schema({
-  id: { type: Number, required: true, unique: true },
-  name: { type: String, required: true },
-  price: { type: Number, required: true },
-  description: { type: String, required: true },
-  stock: { type: Number, required: true },
-  slug: { type: String },
-  createdAt: { type: Date, default: Date.now },
-});
-productSchema.set("toJSON", {
-  transform: (doc, ret) => {
-    delete ret.__v;
-    return ret;
-  },
-});
-const Product = mongoose.model("Product", productSchema);
-
 const getProducts = async (req, res) => {
-  const products = await readProductsData();
-  console.log(products);
-  res.json(products);
+  const excludeFields = ["sort", "fields", "page", "limit"];
+  const queryObj = { ...req.query };
+  console.log(req.query);
+  try {
+    let query = Product.find();
+    excludeFields.forEach((el) => delete queryObj[el]);
+    query = query.find(queryObj);
+    if (req.query.sort) query = query.sort(req.query.sort);
+    if (req.query.fields)
+      query = query.select(req.query.fields.split(",").join(" "));
+
+    const page = req.query.page * 1 || 1;
+    const limit = req.query.limit * 1 || 100;
+    const skip = (page - 1) * limit;
+    query = query.skip(skip).limit(limit);
+    const product = await query;
+    res.json(product);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
 };
 const createProducts = async (req, res) => {
-  // const products = await readProductsData();
+  try {
+    const newProduct = new Product({
+      ...req.body,
+      id: Date.now(),
+      createdAt: new Date(),
+    });
 
-  // const newProduct = {
-  //   ...req.body,
-  //   id: Date.now(),
-  //   createdAt: new Date().toISOString(),
-  // };
+    // Validate against schema requirements
+    // await newProduct.validate();
 
-  // const uniqueChecker = products.every(
-  //   (product) => product.name !== newProduct.name
-  // );
+    // Save to database
+    await newProduct.save();
 
-  // if (!newProduct.price || !newProduct.name) {
-  //   return res.status(400).send("name and price are required fields");
-  // } else if (uniqueChecker) {
-  //   // products.push(newProduct);
-  //   // fs.copyFileSync("./data/products.json", "./data/products_backup.json");
-  //   // fs.writeFileSync("./data/products.json", JSON.stringify(products));
-  //   await Product.create(newProduct);
+    // Return success response
+    res.status(201).json(newProduct);
+  } catch (error) {
+    // Simple error handling
+    // if (error.name === "ValidationError") {
+    //   return res.status(400).send("Validation failed: Missing required fields");
+    // }
 
-  //   res.status(201).json(newProduct);
-  // } else {
-  //   res.status(409).send("product already exists");
-  // }
-
-  const { name, price, description, stock, slug } = req.body;
-
-  if (
-    !req.body.name ||
-    !req.body.price ||
-    !req.body.stock ||
-    !req.body.description
-  ) {
-    return res
-      .status(400)
-      .send("name  price stock  description are required fields");
+    res.status(500).send({ message: error.message });
   }
-
-  const existingProduct = await Product.findOne({ name: req.body.name });
-
-  if (existingProduct) {
-    return res.status(409).send("product already exists");
-  }
-
-  const newProduct = {
-    ...req.body,
-    id: Date.now(),
-    createdAt: new Date(),
-  };
-
-  const createdProduct = await Product.create(newProduct);
-  res.status(201).json(createdProduct);
 };
 
 // const editProduct = async(req, res) => {
@@ -144,23 +109,38 @@ const deleteProduct = async (req, res) => {
     res.status(500).send("An error occurred while deleting the product");
   }
 };
-const buyProduct = (req, res) => {
-  const products = readProductsData();
-  const productIndex = products.findIndex(
-    (product) => product.id === Number(req.params.id)
-  );
-  if (productIndex === -1) {
-    return res.status(404).json({ message: " this product do not exists" });
+const buyProduct = async (req, res) => {
+  //   const products = readProductsData();
+  //   const productIndex = products.findIndex(
+  //     (product) => product.id === Number(req.params.id)
+  //   );
+  //   if (productIndex === -1) {
+  //     return res.status(404).json({ message: " this product do not exists" });
+  //   }
+  //   if (products[productIndex].stock < 1) {
+  //     return res.status(400).json({ message: "stock is zero" });
+  //   }
+  //   const targetProduct = {
+  //     ...products[productIndex],
+  //     stock: products[productIndex].stock - 1,
+  //   };
+  //   products[productIndex] = targetProduct;
+  //   fs.writeFileSync("./data/products.json", JSON.stringify(products));
+  //   res.json(targetProduct);
+
+  const produckToCkeck = await Product.findOne({ id: Number(req.params.id) });
+  if (!produckToCkeck) {
+    return res.status(404).send("can not find product");
   }
-  if (products[productIndex].stock < 1) {
-    return res.status(400).json({ message: "stock is zero" });
+  if (produckToCkeck.stock >= 1) {
+    const productToUpdate = await Product.findOneAndUpdate(
+      { id: Number(req.params.id) },
+      { $inc: { stock: -1 } },
+      { new: true }
+    );
+    return res.json(productToUpdate);
+  } else {
+    return res.status(400).send("out of stock");
   }
-  const targetProduct = {
-    ...products[productIndex],
-    stock: products[productIndex].stock - 1,
-  };
-  products[productIndex] = targetProduct;
-  fs.writeFileSync("./data/products.json", JSON.stringify(products));
-  res.json(targetProduct);
 };
 export { getProducts, createProducts, editProduct, deleteProduct, buyProduct };
