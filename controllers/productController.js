@@ -1,23 +1,13 @@
 import fs from "fs";
 import Product from "../models/productModel.js";
+import filterServise from "../services/filterServise.js";
 import mongoose from "mongoose";
 
 const getProducts = async (req, res) => {
-  const excludeFields = ["sort", "fields", "page", "limit"];
-  const queryObj = { ...req.query };
-  console.log(req.query);
-  try {
-    let query = Product.find();
-    excludeFields.forEach((el) => delete queryObj[el]);
-    query = query.find(queryObj);
-    if (req.query.sort) query = query.sort(req.query.sort);
-    if (req.query.fields)
-      query = query.select(req.query.fields.split(",").join(" "));
+  // const queryObj = { ...req.query };
+  const query = filterServise(Product.find(), req.query);
 
-    const page = req.query.page * 1 || 1;
-    const limit = req.query.limit * 1 || 100;
-    const skip = (page - 1) * limit;
-    query = query.skip(skip).limit(limit);
+  try {
     const product = await query;
     res.json(product);
   } catch (error) {
