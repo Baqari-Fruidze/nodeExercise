@@ -1,6 +1,12 @@
 const filterServise = (query, reqQuery) => {
   let fileteredQuery = query;
-  const productQueryFilter = ["name", "price", "description", "stock"];
+  const productQueryFilter = [
+    "name",
+    "price",
+    "description",
+    "stock",
+    "category",
+  ];
   const filters = {};
 
   productQueryFilter.forEach((el) => {
@@ -12,15 +18,20 @@ const filterServise = (query, reqQuery) => {
   //////////////////////////////
 
   fileteredQuery = query.find(filters);
-  excludeFields.forEach((el) => delete queryObj[el]);
-  query = query.find(queryObj);
-  if (req.query.sort) query = query.sort(req.query.sort);
-  if (req.query.fields)
-    query = query.select(req.query.fields.split(",").join(" "));
-  const page = req.query.page * 1 || 1;
-  const limit = req.query.limit * 1 || 100;
+
+  if (reqQuery.sort) {
+    fileteredQuery = query.sort(reqQuery.sort);
+  }
+  if (reqQuery.fields) {
+    fileteredQuery = fileteredQuery.select(
+      reqQuery.fields.split(",").join(" ")
+    );
+  }
+
+  const page = reqQuery.page * 1 || 1;
+  const limit = reqQuery.limit * 1 || 100;
   const skip = (page - 1) * limit;
-  query = query.skip(skip).limit(limit);
+  fileteredQuery = fileteredQuery.skip(skip).limit(limit);
   return fileteredQuery;
 };
 
