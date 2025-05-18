@@ -51,6 +51,7 @@ productSchema.post("save", function (doc) {
   console.log("product saved", doc);
 });
 productSchema.set("toJSON", {
+  virtuals:true,
   transform: (doc, ret) => {
     delete ret.__v;
     return ret;
