@@ -18,6 +18,7 @@ if (process.env.NODE_ENV === "production") {
   app.use(isMaintenance);
 }
 app.use(express.json());
+app.use(nameToSlug);
 
 if (process.env.NODE_ENV === "production") {
   app.use(limiter);

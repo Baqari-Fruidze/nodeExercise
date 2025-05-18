@@ -96,7 +96,7 @@ const deleteProduct = async (req, res) => {
     res.status(200).json({ message: "Product deleted successfully" });
   } catch (error) {
     console.error(error);
-    res.status(500).send("An error occurred while deleting the product");
+    res.status(500).send({ message: error });
   }
 };
 const buyProduct = async (req, res) => {
@@ -133,4 +133,26 @@ const buyProduct = async (req, res) => {
     return res.status(400).send("out of stock");
   }
 };
-export { getProducts, createProducts, editProduct, deleteProduct, buyProduct };
+const getCategoryStats = async (req, res) => {
+  const stats = await Product.aggregate([
+    {
+      $group: {
+        _id: "$category",
+        numProducts: { $sum: 1 },
+        avgPrice: { $avg: "$price" },
+        minPrice: { $min: "$price" },
+        maxPrice: { $max: "$price" },
+      },
+    },
+    { $sort: { avgPrice: -1 } },
+  ]);
+  res.json(stats);
+};
+export {
+  getProducts,
+  createProducts,
+  editProduct,
+  deleteProduct,
+  buyProduct,
+  getCategoryStats,
+};

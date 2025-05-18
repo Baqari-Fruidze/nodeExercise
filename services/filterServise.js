@@ -20,7 +20,7 @@ const filterServise = (query, reqQuery) => {
   fileteredQuery = query.find(filters);
 
   if (reqQuery.sort) {
-    fileteredQuery = query.sort(reqQuery.sort);
+    fileteredQuery = fileteredQuery.sort(reqQuery.sort);
   }
   if (reqQuery.fields) {
     fileteredQuery = fileteredQuery.select(
