@@ -21,54 +21,12 @@ const productSchema = new mongoose.Schema(
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
-// productSchema.pre("findOneAndDelete", async function (next) {
-//   console.log(this.getQuery());
-//   const product = await this.model.findOne(this.getQuery());
-//   if (product.stock > 0) {
-//     throw new error("can not delete product,it is in stock");
-//   }
-//   next();
-// });
-
-// productSchema.pre("findOneAndDelete", async function (next) {
-//   try {
-//     const query = this.getQuery();
-//     const product = await this.model.findOne(query);
-
-//     if (!product) {
-//       return next(); // Nothing to delete
-//     }
-
-//     if (product.stock > 0) {
-//       return next(new Error("Cannot delete product, it is still in stock."));
-//     }
-
-//     next();
-//   } catch (err) {
-//     next(err);
-//   }
-// });
-// productSchema.pre("findOneAndDelete", async function (next) {
-//   const query = this.getQuery(); // get the deletion query
-//   const product = await this.model.findOne(query);
-
-//   if (!product) return next(); // no product found
-
-//   if (product.archived) return next(); // already archived
-
-//   // Instead of deleting, mark as archived
-//   await this.model.findOneAndUpdate(query, { archived: true });
-
-//   // Cancel the actual delete by not calling next()
-//   // Instead, throw to stop it (or return nothing)
-//   return next(new Error("Soft-deleted: Product archived instead of deleted"));
-// });
 
 productSchema.pre("findOneAndDelete", async function (next) {
-  try {
-    const query = this.getQuery();
-    const product = await this.model.findOne(query);
+  const query = this.getQuery();
 
+  try {
+    const product = await this.model.findOne(query);
     if (!product) {
       return next(); // Nothing to delete
     }
@@ -77,23 +35,11 @@ productSchema.pre("findOneAndDelete", async function (next) {
       return next(new Error("Cannot delete product, it is still in stock."));
     }
 
-    if (product.archived) {
-      return next(); // already archived, allow deletion if necessary
-    }
-
-    // Instead of deleting, mark as archived
-    await this.model.findOneAndUpdate(query, { archived: true });
-
-    // Prevent actual deletion
-    return next(new Error("Soft-deleted: Product archived instead of deleted"));
-  } catch (err) {
-    next(err);
+    next();
+  } catch (error) {
+    next(error.message);
   }
 });
-
-// productSchema.statics.unarchive = async function (query) {
-//   return this.findOneAndUpdate(query, { archived: false }, { new: true });
-// };
 
 productSchema.post("save", function (doc) {
   console.log("product saved", doc);

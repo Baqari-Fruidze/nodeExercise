@@ -95,8 +95,7 @@ const deleteProduct = async (req, res) => {
 
     res.status(200).json({ message: "Product deleted successfully" });
   } catch (error) {
-    console.error(error);
-    res.status(500).send({ message: error });
+    res.status(500).send(error.message);
   }
 };
 const buyProduct = async (req, res) => {
