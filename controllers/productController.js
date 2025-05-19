@@ -77,13 +77,6 @@ const editProduct = async (req, res) => {
 };
 
 const deleteProduct = async (req, res) => {
-  // const products = readProductsData();
-  // const newData = products.filter(
-  //   (product) => product.id !== Number(req.params.id)
-  // );
-  // fs.writeFileSync("./data/products.json", JSON.stringify(newData));
-  // res.status(204).send("product deleted");
-
   const { id } = req.params;
 
   try {

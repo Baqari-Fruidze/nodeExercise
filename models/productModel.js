@@ -22,22 +22,35 @@ const productSchema = new mongoose.Schema(
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
+// productSchema.pre("findOneAndDelete", async function (next) {
+//   const query = this.getQuery();
+
+//   try {
+//     const product = await this.model.findOne(query);
+//     if (!product) {
+//       return next(); // Nothing to delete
+//     }
+
+//     if (product.stock > 0) {
+//       return next(new Error("Cannot delete product, it is still in stock."));
+//     }
+
+//     next();
+//   } catch (error) {
+//     next(error.message);
+//   }
+// });
 productSchema.pre("findOneAndDelete", async function (next) {
   const query = this.getQuery();
-
   try {
-    const product = await this.model.findOne(query);
-    if (!product) {
-      return next(); // Nothing to delete
-    }
-
-    if (product.stock > 0) {
-      return next(new Error("Cannot delete product, it is still in stock."));
-    }
-
+    await this.model.findOneAndUpdate(query, {
+      archived: true,
+    });
+    this.setQuery({ id: -1 });
     next();
-  } catch (error) {
-    next(error.message);
+  } catch (err) {
+    console.log(err.message);
+    next();
   }
 });
 
