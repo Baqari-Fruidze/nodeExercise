@@ -80,7 +80,7 @@ const deleteProduct = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const deletedProduct = await Product.findOneAndDelete({ id: Number(id) });
+    const deletedProduct = await Product.softDelete(Number(id));
 
     if (!deletedProduct) {
       return res.status(404).send("Product not found");

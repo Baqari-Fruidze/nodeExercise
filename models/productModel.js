@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { model } from "mongoose";
 import { type } from "os";
 const productSchema = new mongoose.Schema(
   {
@@ -53,6 +53,15 @@ productSchema.pre("findOneAndDelete", async function (next) {
     next();
   }
 });
+productSchema.statics.softDelete = async function (id) {
+  return await this.findOneAndUpdate(
+    { id },
+    {
+      archived: true,
+    },
+    { new: true }
+  );
+};
 
 productSchema.post("save", function (doc) {
   console.log("product saved", doc);
