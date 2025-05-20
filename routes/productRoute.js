@@ -7,6 +7,7 @@ import {
   deleteProduct,
   buyProduct,
   getCategoryStats,
+  getPriceStats,
 } from "../controllers/productController.js";
 import nameToSlug from "../middlewares/nameToSlug.js";
 // const readProductsData = () => {
@@ -87,5 +88,6 @@ productRouter.route("/").get(getProducts).post(nameToSlug, createProducts);
 productRouter.route("/:id").put(editProduct).delete(deleteProduct);
 productRouter.route("/buy/:id").post(buyProduct);
 productRouter.route("/stats").get(getCategoryStats);
+productRouter.route("/price-stats").get(getPriceStats);
 
 export default productRouter;

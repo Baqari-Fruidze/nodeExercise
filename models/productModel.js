@@ -53,9 +53,9 @@ productSchema.pre("findOneAndDelete", async function (next) {
     next();
   }
 });
-productSchema.statics.softDelete = async function (id) {
+productSchema.statics.softDelete = async function (filter) {
   return await this.findOneAndUpdate(
-    { id },
+    filter,
     {
       archived: true,
     },

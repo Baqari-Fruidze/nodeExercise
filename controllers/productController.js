@@ -80,7 +80,9 @@ const deleteProduct = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const deletedProduct = await Product.softDelete(Number(id));
+    const deletedProduct = await Product.softDelete({
+      id: Number(req.params.id),
+    });
 
     if (!deletedProduct) {
       return res.status(404).send("Product not found");
@@ -140,6 +142,42 @@ const getCategoryStats = async (req, res) => {
   ]);
   res.json(stats);
 };
+const getPriceStats = async (req, res) => {
+  try {
+    const priceRange = await Product.aggregate([
+      {
+        $bucket: {
+          groupBy: "$price",
+          boundaries: [0, 100, 200, 300],
+          default: "other",
+          output: {
+            count: { $sum: 1 },
+            avg: { $avg: "$price" },
+            min: { $min: "$price" },
+            max: { $max: "$price" },
+          },
+        },
+      },
+      {
+        $addFields: {
+          range: {
+            $switch: {
+              branches: [
+                { case: { $lt: ["$_id", 100] }, then: "0-100" },
+                { case: { $lt: ["$_id", 200] }, then: "100-200" },
+                { case: { $lt: ["$_id", 300] }, then: "200-300" },
+              ],
+              default: "other",
+            },
+          },
+        },
+      },
+    ]);
+    res.json(priceRange);
+  } catch (err) {
+    res.status(500).json(err.message);
+  }
+};
 export {
   getProducts,
   createProducts,
@@ -147,4 +185,5 @@ export {
   deleteProduct,
   buyProduct,
   getCategoryStats,
+  getPriceStats,
 };
