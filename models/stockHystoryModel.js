@@ -18,5 +18,5 @@ const stockHystorySchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-const stockystory = mongoose.model("StockHystory", stockHystorySchema);
-export default stockystory;
+const stockHystory = mongoose.model("StockHystory", stockHystorySchema);
+export default stockHystory;

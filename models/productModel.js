@@ -1,5 +1,5 @@
 import mongoose, { model } from "mongoose";
-import { type } from "os";
+import stockHystory from "./stockHystoryModel.js";
 const productSchema = new mongoose.Schema(
   {
     id: { type: Number, required: true, unique: true },
@@ -22,46 +22,33 @@ const productSchema = new mongoose.Schema(
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
+///////////////////////////////////
+
+// productSchema.pre("findOneAndUpdate", async function (next) {
+//   const update = this.getUpdate();
+//   if (!update.stock) return next();
+//   const product = await this.model.findOne(this.getQuery());
+//   if (update.stock === product.stock) return next();
+//   await stockHystory.create({
+//     productId: product._id,
+//     prevStock: product.stock,
+//     currentStock: update.stock,
+//   });
+// });
+
 // productSchema.pre("findOneAndDelete", async function (next) {
 //   const query = this.getQuery();
-
 //   try {
-//     const product = await this.model.findOne(query);
-//     if (!product) {
-//       return next(); // Nothing to delete
-//     }
-
-//     if (product.stock > 0) {
-//       return next(new Error("Cannot delete product, it is still in stock."));
-//     }
-
+//     await this.model.findOneAndUpdate(query, {
+//       archived: true,
+//     });
+//     this.setQuery({ id: -1 });
 //     next();
-//   } catch (error) {
-//     next(error.message);
+//   } catch (err) {
+//     console.log(err.message);
+//     next();
 //   }
 // });
-productSchema.pre("findOneAndDelete", async function (next) {
-  const query = this.getQuery();
-  try {
-    await this.model.findOneAndUpdate(query, {
-      archived: true,
-    });
-    this.setQuery({ id: -1 });
-    next();
-  } catch (err) {
-    console.log(err.message);
-    next();
-  }
-});
-productSchema.statics.softDelete = async function (filter) {
-  return await this.findOneAndUpdate(
-    filter,
-    {
-      archived: true,
-    },
-    { new: true }
-  );
-};
 
 productSchema.post("save", function (doc) {
   console.log("product saved", doc);
@@ -73,6 +60,21 @@ productSchema.set("toJSON", {
     return ret;
   },
 });
+
+/////////////////
+
+productSchema.statics.softDelete = async function (filter) {
+  return await this.findOneAndUpdate(
+    filter,
+    {
+      archived: true,
+    },
+    { new: true }
+  );
+};
+
+////////////////////
+
 productSchema.virtual("status").get(function () {
   return this.stock > 0 ? "avaialble" : "not available";
 });
