@@ -24,17 +24,17 @@ const productSchema = new mongoose.Schema(
 
 ///////////////////////////////////
 
-// productSchema.pre("findOneAndUpdate", async function (next) {
-//   const update = this.getUpdate();
-//   if (!update.stock) return next();
-//   const product = await this.model.findOne(this.getQuery());
-//   if (update.stock === product.stock) return next();
-//   await stockHystory.create({
-//     productId: product._id,
-//     prevStock: product.stock,
-//     currentStock: update.stock,
-//   });
-// });
+productSchema.pre("findOneAndUpdate", async function (next) {
+  const update = this.getUpdate();
+  if (!update.stock) return next();
+  const product = await this.model.findOne(this.getQuery());
+  if (update.stock === product.stock) return next();
+  await stockHystory.create({
+    productId: product._id,
+    previousStock: product.stock,
+    newStock: update.stock,
+  });
+});
 
 // productSchema.pre("findOneAndDelete", async function (next) {
 //   const query = this.getQuery();

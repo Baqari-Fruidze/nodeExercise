@@ -8,7 +8,8 @@ import urlTimePathChecker from "./middlewares/urlTimePathChecker.js";
 import nameToSlug from "./middlewares/nameToSlug.js";
 import isMaintenance from "./middlewares/isMaintenance.js";
 import limiter from "./middlewares/limiter.js";
-
+import Specs from "./middlewares/swagger.js";
+import swaggerUI from "swagger-ui-express";
 import dotenv from "dotenv";
 
 dotenv.config({ path: "./config.env" });
@@ -19,6 +20,7 @@ if (process.env.NODE_ENV === "production") {
 }
 app.use(express.json());
 app.use(nameToSlug);
+app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(Specs));
 
 if (process.env.NODE_ENV === "production") {
   app.use(limiter);

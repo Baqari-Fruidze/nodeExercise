@@ -7,6 +7,10 @@ const stockHystorySchema = new mongoose.Schema(
       ref: "Product",
       required: true,
     },
+    previousStock: {
+      type: Number,
+      required: true,
+    },
     newStock: {
       type: Number,
       required: true,
