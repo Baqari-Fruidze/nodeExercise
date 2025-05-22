@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 
 const getProducts = async (req, res) => {
   // const queryObj = { ...req.query };
+  console.log(req.query);
   const query = filterServise(Product.find(), req.query);
 
   try {
